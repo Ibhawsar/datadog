@@ -1,0 +1,29 @@
+name: Datadog Metrics Demo
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  send-metric:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send custom metric to Datadog
+        run: |
+          curl -X POST "https://api.datadoghq.com/api/v1/series" \
+          -H "Content-Type: application/json" \
+          -H "DD-API-KEY: ${{ secrets.DATADOG_API_KEY }}" \
+          -d '{
+            "series": [
+              {
+                "metric": "github.actions.demo.run",
+                "points": [[ '"$(date +%s)"', 1 ]],
+                "type": "count",
+                "tags": [
+                  "env:learning",
+                  "source:github-actions"
+                ]
+              }
+            ]
+          }'
